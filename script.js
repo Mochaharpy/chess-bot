@@ -4,9 +4,7 @@ const board = Chessboard('board', {
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd,
-    squareClass: 'square',
-    // Disable piece images to use Unicode characters instead
-    pieceTheme: false
+    squareClass: 'square'
 });
 
 const game = new Chess();
@@ -70,8 +68,8 @@ function makeBestMove() {
 }
 
 function renderBoard() {
-    const boardElement = $('#board');
-    boardElement.find('.square').each(function(index) {
+    const squares = $('#board').find('.square');
+    squares.each(function(index) {
         const piece = game.board()[Math.floor(index / 8)][index % 8];
         $(this).html(piece ? pieceUnicode[piece] : '');
     });
