@@ -3,29 +3,36 @@ const board = Chessboard('board', {
     position: 'start',
     onDragStart: onDragStart,
     onDrop: onDrop,
-    onSnapEnd: onSnapEnd
+    onSnapEnd: onSnapEnd,
+    squareClass: 'square'
 });
 
 const game = new Chess();
 
-function onDragStart (source, piece, position, orientation) {
-    if (game.in_checkmate() === true || game.in_draw() === true ||
-        piece.search('w') === -1) {
+const pieceUnicode = {
+    'p': '♟', 'P': '♙',
+    'r': '♞', 'R': '♖',
+    'n': '♟', 'N': '♘',
+    'b': '♝', 'B': '♗',
+    'q': '♛', 'Q': '♕',
+    'k': '♚', 'K': '♔'
+};
+
+function onDragStart(source, piece) {
+    if (game.in_checkmate() || game.in_draw() || piece.search('w') === -1) {
         return false;
     }
 }
 
-function onDrop (source, target) {
+function onDrop(source, target) {
     const move = game.move({
         from: source,
         to: target,
         promotion: 'q' // promote to a queen
     });
 
-    removeGreySquares();
-    
     if (move === null) return 'snapback';
-
+    
     renderMoveHistory(game.history());
     
     if (game.game_over()) {
@@ -35,22 +42,22 @@ function onDrop (source, target) {
     }
 }
 
-function onSnapEnd () {
+function onSnapEnd() {
     board.position(game.fen());
+    renderBoard();
 }
 
-function renderMoveHistory (moves) {
+function renderMoveHistory(moves) {
     const historyElement = $('#status');
-    historyElement.empty();
     historyElement.empty();
     historyElement.append(moves.join(', '));
 }
 
 function makeBestMove() {
     const possibleMoves = game.ugly_moves();
-    let bestMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-    
-    // For different difficulty levels, you can implement Minimax or adjust this logic
+    if (possibleMoves.length === 0) return;
+
+    const bestMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
     game.move(bestMove);
     board.position(game.fen());
     renderMoveHistory(game.history());
@@ -60,9 +67,28 @@ function makeBestMove() {
     }
 }
 
-function removeGreySquares() {
-    $('#board .square-55d63').css('background', '');
+function renderBoard() {
+    const boardElement = $('#board');
+    boardElement.empty();
+    
+    const squares = boardElement.find('.square');
+    for (let i = 0; i < 64; i++) {
+        const square = squares[i];
+        const piece = game.board()[Math.floor(i / 8)][i % 8];
+        $(square).html(piece ? pieceUnicode[piece] : '');
+    }
 }
 
-$('#startBtn').on('click', board.start);
-$('#clearBtn').on('click', board.clear);
+$('#startBtn').on('click', () => {
+    game.reset();
+    board.start();
+    renderBoard();
+});
+
+$('#clearBtn').on('click', () => {
+    game.clear();
+    board.clear();
+    renderBoard();
+});
+
+renderBoard();
