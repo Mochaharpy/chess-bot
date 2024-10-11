@@ -4,15 +4,17 @@ const board = Chessboard('board', {
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd,
-    squareClass: 'square'
+    squareClass: 'square',
+    // Disable piece images to use Unicode characters instead
+    pieceTheme: false
 });
 
 const game = new Chess();
 
 const pieceUnicode = {
     'p': '♟', 'P': '♙',
-    'r': '♞', 'R': '♖',
-    'n': '♟', 'N': '♘',
+    'r': '♖', 'R': '♖',
+    'n': '♞', 'N': '♘',
     'b': '♝', 'B': '♗',
     'q': '♛', 'Q': '♕',
     'k': '♚', 'K': '♔'
@@ -69,14 +71,10 @@ function makeBestMove() {
 
 function renderBoard() {
     const boardElement = $('#board');
-    boardElement.empty();
-    
-    const squares = boardElement.find('.square');
-    for (let i = 0; i < 64; i++) {
-        const square = squares[i];
-        const piece = game.board()[Math.floor(i / 8)][i % 8];
-        $(square).html(piece ? pieceUnicode[piece] : '');
-    }
+    boardElement.find('.square').each(function(index) {
+        const piece = game.board()[Math.floor(index / 8)][index % 8];
+        $(this).html(piece ? pieceUnicode[piece] : '');
+    });
 }
 
 $('#startBtn').on('click', () => {
