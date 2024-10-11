@@ -31,10 +31,12 @@ function onDrop(source, target) {
         promotion: 'q' // promote to a queen
     });
 
+    // If the move is illegal, snap back the piece
     if (move === null) return 'snapback';
-    
+
     renderMoveHistory(game.history());
-    
+
+    // Check for game over conditions
     if (game.game_over()) {
         alert('Game over');
     } else {
@@ -44,7 +46,6 @@ function onDrop(source, target) {
 
 function onSnapEnd() {
     board.position(game.fen());
-    renderBoard();
 }
 
 function renderMoveHistory(moves) {
@@ -57,11 +58,12 @@ function makeBestMove() {
     const possibleMoves = game.ugly_moves();
     if (possibleMoves.length === 0) return;
 
+    // Choose a random legal move for the bot
     const bestMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
     game.move(bestMove);
     board.position(game.fen());
     renderMoveHistory(game.history());
-    
+
     if (game.game_over()) {
         alert('Game over');
     }
@@ -87,4 +89,5 @@ $('#clearBtn').on('click', () => {
     renderBoard();
 });
 
+// Initial rendering of the board
 renderBoard();
